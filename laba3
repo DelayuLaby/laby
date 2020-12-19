@@ -1,0 +1,195 @@
+#include <iostream>
+#include <cassert>
+
+используя пространство имен std;
+
+class V_matr {
+частный:
+	двойной ** матр;
+	int row, col;
+	int k = 0;
+общественность:
+	V_matr () {
+		строка = 1;
+		col = 1;
+		matr = новый двойной * [строка];
+		matr [0] = новый двойной [столбец];
+		matr [0] [0] = 2,45;
+	}
+	
+	V_matr (int a, int b)
+	{
+		row = a; 
+		col = b;
+		matr = новый двойной * [строка];
+		for (int i = 0; i <row; i ++) {
+			matr [я] = новый двойной [столбец];
+			для (int j = 0; j <col; j ++)
+			{
+				matr [i] [j] = (rand ()% 1000 / 10.0f);
+			}
+		}
+	}
+
+	V_matr (const V_matr & copy) {
+		row = copy.row;
+		col = copy.col;
+		matr = новый двойной * [строка];
+		for (int i = 0; i <row; i ++) {
+			matr [я] = новый двойной [столбец];
+			for (int j = 0; j <col; j ++) {
+				matr [i] [j] = copy.matr [i] [j];
+			}
+		}
+	}
+
+	~ V_matr () {
+		для (int p = 0; p <row; p ++)
+		удалить [] матрицу [p];
+		удалить (матрица);
+	};
+
+	двойной & оператор () (int indeX, int indeY);
+
+
+	V_matr оператор + (V_matr m2) 
+	{
+		V_matr c (строка, столбец);
+		для (int y = 0; y <row; y ++)
+		{
+			для (int x = 0; x <col; x ++)
+			{
+				c (x, y) = matr [x] [y] + m2 (x, y);
+			}
+		}
+		return c;
+	}
+
+
+	друг ostream & оператор << (ostream & out, V_matr m)
+	{
+		для (int k = 0; k <m.row; k ++)
+		{
+			для (int h = 0; h <m.col; h ++)
+			{
+				cout << m.getmatr_el (k, h) << "";
+			}
+			cout << endl;
+		}
+		вернуться;
+	}
+
+	двойной getmatr_el (int row_el, int col_el);
+	void input ();
+	void setmatr_el (int row_el, int col_el);
+	недействительное изменение ();
+};
+
+double & V_matr :: operator () (int indeX, int indeY) {
+	assert (indeX> = 0 && indeX <строка);
+		assert (indeY> = 0 && indeY <col);
+		return matr [indeX] [indeY];
+}
+
+
+
+
+int main () {
+	V_matr obj1 (5, 5);
+	cout << "obj1: \ n" << obj1 << "\ n" << endl;
+	cout << "obj [1] [4] =" << obj1 (1, 4) << endl << endl << endl;
+
+	V_matr obj2 (5, 5);
+	cout << "obj2: \ n" << obj2 << "\ n" << endl;
+
+	V_matr sum = obj1 + obj2;
+	cout << "sum: \ n" << sum << "\ n" << endl;
+
+	В_матр ым;
+	cout << "ym: \ n" << ym << endl;
+
+	V_matr * m1 = новый V_matr (5, 5);
+	m1-> input ();
+	cout << "m1: \ n" << * m1 << "\ n" << endl;
+	
+	V_matr * m1_copy = новый V_matr (* m1);
+	cout << "m1_copy: \ n" << * m1_copy << "\ n" << endl;
+	m1-> изменить ();
+	cout << "m1: \ n" << * m1 << "\ n" << endl;
+	cout << "m1_copy: \ n" << * m1_copy << "\ n" << endl;
+	удалить m1;
+	удалить m1_copy;
+
+	V_matr * A1 = новый V_matr [5];
+	для (int f = 0; f <5; f ++)
+	{
+		cout << "A1 [" << f << "]:" << A1 [f] << endl;
+	}
+	для (int f = 0; f <5; f ++)
+	{
+		cout << "A1 [" << f << "]:" << endl;
+		A1 [f] .input ();
+	}
+	для (int f = 0; f <5; f ++)
+	{
+		cout << "A1 [" << f << "]:" << A1 [f] << endl;
+	}
+	удалить [] A1;
+
+	
+	возврат 0;
+}
+
+двойной V_matr :: getmatr_el (int row_el, int col_el) {
+	return matr [row_el] [col_el];
+}
+
+void V_matr :: setmatr_el (int row_el, int col_el)
+{
+	int k = 0;
+	int flag = 0;
+	делать
+	{
+		flag = 0;
+		перемотка назад (стандартный ввод);
+		cout << "Входной элемент [" << row_el << "] [" << col_el << "]" << endl;
+		cin >> k;
+		если (cin.fail ())
+		{
+			cin.clear ();
+			cin.ignore ();
+			flag = 1;
+		}
+	} while (флаг);
+	матрица [row_el] [col_el] = k;
+}
+
+пусто V_matr :: input ()
+{
+	для (int m = 0; m <строка; m ++)
+	{
+		для (int n = 0; n <col; n ++)
+		{
+			setmatr_el (м, п);
+		}
+	}
+}
+
+void V_matr :: change () {
+
+	if ((row == 0 && col == 0) || (row == 1 && col == 1)) {
+		cout << "ОШИБКА" << endl;
+		возвращение;
+	}
+		int k = col / 2;
+		двойная температура = 0;
+		for (int x = 0; x <row; x ++) {
+			for (int y = 0; y <col; y ++) {
+				temp = matr [x] [0];
+				матрица [x] [0] = матрица [x] [k];
+				matr [x] [k] = temp;
+			}
+		}
+	
+
+}
