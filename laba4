@@ -1,0 +1,110 @@
+#include <iostream>
+#include <string>
+
+
+using namespace std;
+
+class furniture {
+private:
+    string matrl;
+public:
+    furniture(string matrl): matrl(matrl) {}
+    ~furniture() {}
+
+    string GetMatrl() const {
+        return matrl;
+    }
+    void printInfo() {
+        cout << "MATRL: " << this->GetMatrl() << endl;
+    }
+};
+
+
+class cupboard : public furniture {
+private:
+    int kol_vo;
+public:
+    cupboard(string matrl, int kol_vo):furniture(matrl), kol_vo(kol_vo){}
+    ~cupboard() {}
+
+    int GetKol_vo() const {
+        return kol_vo;
+    }
+    void printInfo() {
+        cout << "MATRL: " << this->GetMatrl()  << "kolichestvo: " << this->GetKol_vo() << endl;
+    }
+};
+
+class closet : public cupboard {
+private:
+    double price;
+public:
+    closet(string matrl, int kol_vo, double price): cupboard(matrl, kol_vo), price(price)  {}
+    ~closet() {}
+
+    double GetPrice() const {
+        return price;
+    }
+    void printInfo() {
+        cout << "MATRL: " << this->GetMatrl() << "kolichestvo: " << this->GetKol_vo() << "Price: " << this->GetPrice() << endl;
+    }
+};
+
+class bed : public furniture {
+private:
+    double dlina;
+public:
+    bed(string matrl, double dlina): furniture(matrl), dlina(dlina) {}
+    ~bed() {}
+
+    double GetDlina() const {
+        return dlina;
+    }
+    void printInfo() {
+        cout << "MATRL: " << this->GetMatrl() << "Dlina: " << this->GetDlina() << endl;
+    }
+};
+
+class double_bed : public bed {
+private:
+    double shirina;
+public:
+    double_bed(string matrl, double dlina, double shirina): bed(matrl, dlina), shirina(shirina) {}
+    ~double_bed() {}
+
+    double GetShirina() const {
+        return shirina;
+    }
+    void printInfo() {
+        cout << "MATRL: " << this->GetMatrl() << "Dlina: " << this->GetDlina() << "SHIRINA: " << this->GetShirina() << endl;
+    }
+};
+
+class double_closet_bed :public double_bed, public closet {
+private:
+    int procent_krutosti;
+public:
+    double_closet_bed(string matrl, int kol_vo, double price, double dlina, double shirina, int procent_krutosti): closet(matrl, kol_vo, price), double_bed(matrl, dlina, shirina), procent_krutosti(procent_krutosti){}
+    ~double_closet_bed() {}
+
+    int GetPC() const {
+        return procent_krutosti;
+    }
+    void printInfo() {
+        cout << "MATRL: " << this->furniture::GetMatrl() << "kolichestvo: " << this->GetKol_vo() << "Price: " << this->GetPrice() << "Dlina: " << this->GetDlina() << "SHIRINA: " << this->GetShirina() << "procent krutosti: " << this->GetPC() << endl;
+    }
+};
+
+int main()
+{
+    setlocale(LC_ALL, "Russian");
+    string matrl;
+    int kol_vo, PC;
+    double dlina, shirina, price;
+    cin >> matrl >> kol_vo >> price >> dlina >> shirina >> PC;
+    double_closet_bed UBERMASHINA3000(matrl, kol_vo, price, dlina, shirina, PC);
+    UBERMASHINA3000.printInfo();
+    return 0;
+}
+
+
