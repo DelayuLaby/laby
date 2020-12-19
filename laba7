@@ -1,1 +1,409 @@
+#include <iostream>
+#include <string>
+#include <cctype>
+#include <sstream>
+#include <memory>
+using namespace std;
 
+//класс (элемент) контейнера
+class cat 
+{
+public:
+	friend ostream& operator<<(ostream& out, const cat& op);
+	friend class vector;
+	cat() {
+		id = "1234";
+		name = "not you";
+		diagnosis = "wtf&!&!&!";
+		age = 1234;
+	}
+	cat(string i, string n, string d, int a) {
+		id = i;
+		name = n;
+		diagnosis = d;
+		age = a;
+	}
+private:
+	string id;
+	string name;
+	string diagnosis;
+	int age;
+};
+
+
+ostream& operator<<(ostream& out, const cat& op) {
+	out <<"id is: " << op.id << endl << "Name a cat: " << op.name << endl << "Diagnosis: " << op.diagnosis << endl << "Age is: " << op.age << endl;
+	return out;
+}
+
+//итератор вывода
+class my_iterator : public std::iterator<std::output_iterator_tag, cat> {
+	friend class vector;
+private:
+	my_iterator(cat* p);
+public:
+	my_iterator(const my_iterator& it);
+	bool operator!=(my_iterator const& other) const;
+	bool operator==(my_iterator const& other) const;
+	cat& operator*() const;
+	cat* operator->()const;
+	my_iterator& operator++();
+	cat& operator[](int);
+private:
+	cat* p;
+};
+
+class bad_bound
+{
+public:
+	string str;
+	int fl;
+	bad_bound(int i)
+	{
+		fl = 1;
+		str = "Out of boundaries";
+	}
+	void msg()
+	{
+		cout << str << endl;
+	}
+};
+
+class bad_string
+{
+public:
+	string str;
+	int fl;
+	bad_string(string s)
+	{
+		fl = 1;
+		str = "You can't enter characters.";
+	}
+	void msg()
+	{
+		cout << str << endl;
+	}
+};
+
+class vector {
+public:
+	vector(std::initializer_list<cat> values);
+	~vector()
+	{
+		delete[] data;
+	}
+	const my_iterator begin() const;
+	const my_iterator end() const;
+	my_iterator begin();
+	my_iterator end();
+	void show()
+	{
+		my_iterator it = this->begin();
+		while (it != this->end())
+		{
+			std::cout << *it << endl;
+			++it;
+		}
+	}
+	void resize(int);
+	void sort(int, int, int);
+	void add()
+	{
+		string a_id, a_name, a_diagn, mem, temp_pos;
+		int pos, a_age;
+		cout << "Enter position:" << endl;
+		try
+		{
+			getline(cin, temp_pos);
+			for (int i = 0; i < temp_pos.size(); i++)
+				if (!isdigit(temp_pos[i]))
+					throw bad_string(temp_pos);
+		}
+		catch (bad_string bs)
+		{
+			while (bs.fl == 1)
+			{
+				bs.msg();
+				getline(cin, mem);
+				for (int i = 0; i < mem.size(); i++)
+					if (!isdigit(mem[i]))
+						break;
+					else
+						bs.fl = 0;
+			}
+		}
+		stringstream in;
+		in << temp_pos;
+		in >> pos;
+		try
+		{
+			if (pos > size - 1) throw bad_bound(pos);
+		}
+		catch (bad_bound bb)
+		{
+			while (bb.fl == 1)
+			{
+				bb.msg();
+				getline(cin, mem);
+				for (int i = 0; i < mem.size(); i++)
+					if (!isdigit(mem[i]))
+						break;
+					else
+						bb.fl = 0;
+				if (bb.fl == 0)
+				{
+					stringstream in;
+					in << mem;
+					in >> pos;
+					if (pos > size - 1)
+						bb.fl = 1;
+				}
+			}
+		}
+		cout << "Enter id:" << endl;
+		getline(cin, a_id);
+		cout << "Enter name:" << endl;
+		getline(cin, a_name);
+		cout << "Enter diagnosis:" << endl;
+		getline(cin, a_diagn);
+		cout << "Enter the age:" << endl;
+		try
+		{
+			getline(cin, mem);
+			for (int i = 0; i < mem.size(); i++)
+				if (!isdigit(mem[i]))
+					throw bad_string(mem);
+		}
+		catch (bad_string bs)
+		{
+			while (bs.fl == 1)
+			{
+				bs.msg();
+				getline(cin, mem);
+				for (int i = 0; i < mem.size(); i++)
+					if (!isdigit(mem[i]))
+						break;
+					else
+						bs.fl = 0;
+			}
+		}
+		cout << endl << endl;
+		stringstream input;
+		input << mem;
+		input >> a_age;
+		my_iterator it = this->begin();
+		if (pos == size - 1)
+		{
+			it[pos].id = a_id;
+			it = this->begin();
+			it[pos].name = a_name;
+			it = this->begin();
+			it[pos].age = a_age;
+		}
+		else
+		{
+			int j = size - 1;
+			it = this->begin();
+			my_iterator it2 = this->begin();
+			for (j; j > pos; j--)
+			{
+				it[j] = it2[j - 1];
+				it = this->begin();
+				it2 = this->begin();
+			}
+			it[j].id = a_id;
+			it = this->begin();
+			it[j].name = a_name;
+			it = this->begin();
+			it[j].age = a_age;
+		}
+
+	}
+	int find()//поиск по имени
+	{
+		string str;
+		cout << "Enter name:" << endl;
+		getline(cin, str);
+		my_iterator it = this->begin();
+		int i = 0;
+		while (it != this->end())
+		{
+			if (it->name == str)
+			{
+				cout << *it << endl;
+				return i;
+			}
+			i++;
+			++it;
+		}
+		cout << "Didn't find." << endl;
+		return -1;
+	}
+	void del(int num)
+	{
+		try
+		{
+			if (num > size || num < 0) throw bad_bound(num);
+		}
+		catch (bad_bound bb)
+		{
+			bb.msg();
+			return;
+		}
+		my_iterator it = this->begin();
+		my_iterator it2 = this->begin();
+		if (num == size - 1)
+			resize(size - 1);
+		else
+		{
+			it[num];
+			it2[num + 1];
+			while (it2 != this->end())
+			{
+				*it = *it2;
+				++it;
+				++it2;
+			}
+			resize(size - 1);
+		}
+	}
+	int getSize()
+	{
+		return size;
+	}
+private:
+	size_t size;
+	cat* data;
+};
+
+vector::vector(std::initializer_list<cat> values) :
+	size(values.size())
+{
+	data = new cat[size];
+	std::copy(values.begin(), values.end(), data);
+}
+
+const my_iterator vector::begin() const
+{
+	return my_iterator(data);
+}
+
+const my_iterator vector::end() const
+{
+	return my_iterator(data + size);
+}
+
+my_iterator vector::begin()
+{
+	return my_iterator(data);
+}
+
+my_iterator vector::end()
+{
+	return my_iterator(data + size);
+}
+
+my_iterator::my_iterator(cat* p) :
+	p(p)
+{
+
+}
+
+my_iterator::my_iterator(const my_iterator& it) :
+	p(it.p)
+{
+
+}
+
+bool my_iterator::operator!=(my_iterator const& other) const
+{
+	return p != other.p;
+}
+
+cat& my_iterator::operator*() const
+{
+	return *p;
+}
+
+cat* my_iterator::operator->() const
+{
+	return p;
+}
+
+
+my_iterator& my_iterator::operator++()
+{
+	++p;
+	return *this;
+}
+
+cat& my_iterator::operator[](int n)
+{
+	for (int i = 0; i < n; i++)
+		++p;
+	return *p;
+}
+
+bool my_iterator::operator==(my_iterator const& other) const
+{
+	return p == other.p;
+}
+
+void vector::sort(int m, int left, int right)
+{
+	int l = left, r = right;
+	cat mem;
+	if ((right - left) > 1)
+	{
+		while (l < r)
+		{
+			while ((data[l].name[0] <= data[m].name[0]) && l < m)
+				l++;
+			while ((data[r].name[0] > data[m].name[0]) && r > m)
+				r--;
+			if (l < r)
+			{
+				mem = data[r];
+				data[r] = data[l];
+				data[l] = mem;
+			}
+		}
+		sort(m / 2, left, m);
+		sort((m + right) / 2, m, right);
+	}
+}
+
+void vector::resize(int new_size)
+{
+	cat* mem = new cat[new_size];
+	if (new_size < size || size == 0) size = new_size;
+	for (int i = 0; i < size; i++)
+		mem[i] = data[i];
+	delete[] data;
+	size = new_size;
+	data = mem;
+}
+
+
+
+int main()
+{
+	cat A = { "12312","Murluka", "Salmonellosis",  11 };
+	cat B = { "45656","Kuzya", "healthy", 12 };
+	cat C = { "78989","Arnold", "Conjunctivitis", 9 };
+	cat D = { "12345","leva", "ringworm", 4 };
+	vector V = { A,B,C,D };
+	my_iterator it = V.begin();
+	V.show();
+	V.resize(5);
+	it = V.begin();
+	V.add();
+	V.show();
+	V.del(V.find());
+	V.show();
+	V.sort(V.getSize() / 2, 0, V.getSize() - 1);
+	cout << "After sorting:" << endl;
+	V.show();
+	std::cout << std::endl;
+	return 0;
+}
