@@ -1,1 +1,761 @@
+//Production.cpp
 
+#include "Production.h"
+Production::Production() : name("-"), kol_vo(0), num_c(0) {}
+Production::Production(string f, int g, int l) : name(f), kol_vo(g), num_c(l) {}
+void Production::set_name(string f)
+{
+	name = f;
+}
+void Production::set_kol_vo(int g)
+{
+	kol_vo = g;
+}
+void Production::set_num_c(int l)
+{
+	num_c = l;
+}
+string Production::get_name()
+{
+	return name;
+}
+int Production::get_kol_vo()
+{
+	return kol_vo;
+}
+int Production::get_num_c()
+{
+	return num_c;
+}
+ostream& operator<<(ostream& out, const Production t)
+{
+	return out;
+}
+istream& operator>>(istream& in, Production& t)
+{
+	
+	in >> t.kol_vo;
+	in >> t.num_c;
+	return in;
+}
+bool operator==(Production t1, Production t2) {
+	if (t1.num_c - t1.kol_vo == t2.num_c - t2.kol_vo)
+		return true;
+	else
+		return false;
+}
+bool operator<(const Production t1, const Production t2)
+{
+	if (t1.num_c - t1.kol_vo < t2.num_c - t2.kol_vo)
+		return true;
+	else
+		return false;
+}
+bool operator>(const Production t1, const Production t2)
+{
+	if (t1.num_c - t1.kol_vo > t2.num_c - t2.kol_vo)
+		return true;
+	else
+		return false;
+}
+
+//Production.h
+
+#pragma once
+#include<iostream>
+using namespace std;
+class Production
+{
+private:
+
+	int kol_vo;
+	int num_c;
+public:
+	string name;
+	Production();
+	Production(string f, int g, int l);
+	void set_name(string);
+	void set_kol_vo(int);
+	void set_num_c(int);
+	string get_name();
+	int get_kol_vo();
+	int get_num_c();
+	friend ostream& operator<<(ostream& out, const Production c);
+	friend istream& operator>>(istream& in, Production& t);
+	friend bool operator==(const Production t1, const Production t2);
+	friend bool operator<(const Production t1, const Production t2);
+	friend bool operator>(const Production t1, const Production t2);
+};
+
+//t.cpp
+#include"t.h"
+
+
+Node::Node() : data(), next(nullptr) { }
+
+Node::Node(Production d) : data(d), next(nullptr) { }
+
+
+List::List() : head(nullptr), size(0) {}
+void List::push(Production x)
+{
+	if (head == nullptr)
+	{
+		Node* element = new Node(x);
+		head = new Node(x);
+		element->next = head;
+		head = element;
+		size++;
+	}
+	else
+	{
+		Node* tmp = head;
+		int i = 0;
+		while (i < size - 1)
+		{
+			tmp = tmp->next;
+			i++;
+		}
+		tmp->next = new Node(x);
+		tmp->next->next = head;
+		size++;
+	}
+}
+void List::pop()
+{
+	if (size == 0)
+		throw Exception();
+	Node* tmp = head;
+	head = head->next;
+	delete tmp;
+	size--;
+	Node* t = head;
+	int i = 0;
+	while (i < size - 1)
+	{
+		t = t->next;
+		i++;
+	}
+	t->next = head;
+}
+void List::output()
+{
+	if (size == 0)
+		throw Exception();
+	Node* tmp = head;
+	int i = 0;
+	while (i < size)
+	{
+		cout << "   " << tmp->data;
+		tmp = tmp->next;
+		i++;
+	}
+}
+Node* List::get_node()
+{
+	return head;
+}
+int List::get_size()
+{
+	return size;
+}
+ostream& operator<<(ostream& out, const Node& node)
+{
+	out << node.data;
+	return out;
+}
+Iterator::Iterator(List* element) : current(0)
+{
+	node = element->get_node();
+	size = element->get_size();
+}
+void Iterator::begin()
+{
+	if (size == 0)
+		throw Exception();
+	if (current != 0)
+	{
+		while (current < size)
+		{
+			current++;
+			node = node->next;
+		}
+		current = 0;
+	}
+
+}
+void Iterator::search(Production x)
+{
+	if (size == 0)
+		throw Exception();
+	int i = 0;
+	while (i < size)
+	{
+		if (x == node->data)
+		{
+			cout << "\nElement\n " << x << "\nfound" << endl;
+			return;
+		}
+		if (current == size - 1)
+			current = 0;
+		else
+			current++;
+		node = node->next;
+		i++;
+	}
+	cout << "\nElement\n " << x << " \nnot found" << endl;
+}
+Iterator& Iterator:: operator++()
+{
+	if (size == 0)
+		throw Exception();
+	if (size == 1)
+		current = 0;
+	else
+		current++;
+	node = node->next;
+	return *this;
+}
+Production Iterator::  operator*() {
+	return node->data;
+}
+void Iterator:: operator = (Production x)
+{
+	if (size == 0)
+		throw Exception();
+	node->data = x;
+}
+Iterator& Iterator:: operator[](int index)
+{
+	if (size == 0)
+		throw Exception();
+	Node* tmp = node;
+	while (1)
+	{
+		if (current == index)
+		{
+			node = tmp;
+			return *this;
+		}
+		tmp = tmp->next;
+		if (current == size - 1)
+			current = 0;
+		else
+			current++;
+	}
+}
+void Iterator::SORT()
+{
+	if (size == 0)
+		throw Exception();
+	int step, i,location;
+	Production newElement;
+	for (int i = 1; i < size; i++) {
+		newElement = (*this)[i].node->data;
+		location = i - 1;
+		while (location>=0 && (*this)[location].node->data > newElement)
+		{
+			(*this)[location+1].node->data = (*this)[location].node->data;
+			location = location - 1;
+		}
+		(*this)[location + 1].node->data = newElement;
+	}
+}
+
+ostream& operator<<(ostream& out, const Iterator& it)
+{
+	out << it.node;
+	return out;
+}
+
+//t.h
+#pragma once
+#include<iostream>
+#include"Production.h"
+
+using namespace std;
+class Exception
+{
+};
+
+
+class  Node
+{
+public:
+	Production data;
+	Node* next;
+	Node();
+	Node(Production d);
+};
+
+
+class List
+{
+private:
+	Node* head;
+	int size;
+public:
+	List();
+	void push(Production x);
+	void pop();
+	void output();
+	Node* get_node();
+	int get_size();
+	friend ostream& operator<<(ostream& out, const Node& node);
+};
+
+
+class Iterator
+{
+private:
+	Node* node;
+	int size;
+	int current;
+public:
+	friend List;
+	Iterator(List* element);
+	void begin();
+	void search(Production x);
+	Iterator& operator++();
+	Production operator*();
+	void operator = (Production x);
+	Iterator& operator[](int index);
+	void SORT();
+	friend ostream& operator<<(ostream& out, const Iterator& it);
+};
+
+//File.cpp
+#include "File.h"
+
+File::File() : name("-"), key(no), size(0) {}
+File::File(string n, Key k) : name(n), key(k), size(0) {}
+File& operator<<(File& file, const char* s)
+{
+
+	if (!file.file.is_open())
+	{
+		throw 1;
+	}
+
+	/*catch (int i)
+	{
+	Exception ex(i);
+	ex.Print();
+	}*/
+	string str = s;
+	file.file << str;
+	return file;
+}
+fstream& operator<<(fstream& out, Production& t) {
+
+	if (!out.is_open())
+	{
+		throw 1;
+	}
+
+	/*catch (int i)
+	{
+	Exception ex(i);
+	ex.Print();
+	}*/
+	int a = out.tellg();
+	string name = t.get_name();
+	size_t len1 = name.length() + 1;
+
+	int kol_vo = t.get_kol_vo();
+	int num_c = t.get_num_c();
+
+
+	out.write((char*)(&len1), sizeof(len1));
+	out.write((char*)(name.c_str()), len1);
+
+	out.write((char*)(&kol_vo), sizeof(kol_vo));
+	out.write((char*)(&num_c), sizeof(num_c));
+
+	return out;
+}
+File& operator<<(File& file, Production& t)
+{
+	int pos = 0, a = 0, size = 0;
+
+	if (!file.file.is_open())
+	{
+		cout << "1";
+	}
+
+	/*catch (int i)
+	{
+	Exception ex(i);
+	ex.Print();
+	}*/
+	if (file.key == txt) {
+		file.file << t.get_name() << " " << t.get_kol_vo() << " " << t.get_num_c() << " " << endl;
+	}
+	else if (file.key == bin) {
+		string name = t.get_name();
+		size_t len1 = name.length() + 1;
+
+		int kol_vo = t.get_kol_vo();
+		int num_c = t.get_num_c();
+
+		file.file.write((char*)(&len1), sizeof(len1));
+		file.file.write((char*)(name.c_str()), len1);
+
+		file.file.write((char*)(&kol_vo), sizeof(kol_vo));
+		file.file.write((char*)(&num_c), sizeof(num_c));
+
+	}
+	return file;
+}
+ostream& operator<<(ostream& out, File& file)
+{
+	int a = 0;
+
+	if (!file.file.is_open())
+	{
+		throw 1;
+	}
+
+	/*catch (int i)
+	{
+	Exception ex(i);
+	ex.Print();
+	}*/
+	if (file.key == txt) {
+		string str;
+		while (!file.file.eof()) {
+			getline(file.file, str);
+			a = file.file.tellg();
+			cout << str << endl;
+		}
+	}
+	else if (file.key == bin) {
+		int i = 0;
+		int size = 0, step = 0;
+		/*Student tmp;*/
+		while (i < file.size) {
+			int num_c;
+			int kol_vo;
+
+			size_t len;
+
+			file.file.read((char*)(&len), sizeof(len));
+			char* f = new char[len];
+
+			file.file.read((char*)(f), len);
+			f[len - 1] = '\0';
+
+			file.file.read((char*)(&kol_vo), sizeof(int));
+			file.file.read((char*)(&num_c), sizeof(int));
+
+
+			cout << f << " " << kol_vo << " " << num_c << " " << endl;
+
+			delete[] f;
+			i++;
+
+		}
+	}
+	return out;
+}
+
+File::~File() { file.close(); }
+void File::open(string mode)
+{
+	switch (key)
+	{
+	case txt: {
+		if (mode == "r") {
+			file.open(name, ios_base::in);   //äëÿ ââîäà
+		}
+		else if (mode == "add") {
+			file.open(name, ios_base::app);  //çàïèñü â êîíåö ôàéëà
+		}
+		else if (mode == "w") {
+			file.open(name, ios_base::out);  //äëÿ âûâîäà
+		}
+		else if (mode == "wr") {
+			file.open(name, ios_base::in | ios_base::out); //äëÿ ââîäà è âûâîäà
+		}
+		break;
+	}
+	case bin: {
+		if (mode == "r") {
+			file.open(name, ios_base::binary | ios_base::in);    //äëÿ ââîäà
+		}
+		else if (mode == "add") {
+			file.open(name, ios_base::binary | ios_base::app);   //çàïèñü â êîíåö ôàéëà
+		}
+		else if (mode == "w") {
+			file.open(name, ios_base::binary | ios_base::out);   //äëÿ âûâîäà
+		}
+		else if (mode == "wr") {
+			file.open(name, ios_base::binary | ios_base::in | ios_base::out);   //äëÿ ââîäà è âûâîäà
+		}
+		break;
+	}
+
+	}
+	/*if (!file.is_open())
+	{
+	throw ;
+	}
+	*/
+}
+void File::close()
+{
+	file.close();
+}
+void File::begin()
+{
+	file.seekg(0, ios_base::beg);  //ïåðåìåùåíèå óêàçàòåëÿ ïîçèöèîíèðîâàíèÿ â íà÷àëî ôàéëà
+}
+void File::set_size(int s) {
+	size = s;
+}
+int File::get_size() {
+	return	size;
+}
+Production File::read()
+{
+	string str;
+	Production t;
+	getline(this->file, str, ' ');
+	t.set_name(str);
+	getline(this->file, str, ' ');
+	t.set_kol_vo(stoi(str));
+	getline(this->file, str, ' ');
+	t.set_num_c(stoi(str));
+	return t;
+}
+void File::edit(int line, Production mas[]) {
+	this->open("wr");
+
+	int a, b;
+
+	/*try {
+	if (!file.is_open())
+	{
+	throw 1;
+	}
+	}
+	catch (int i)
+	{
+	Exception ex(i);
+	ex.Print();
+	return;
+	}*/
+	Production tmp;
+	if (this->key == txt) {
+		string str;
+		for (int i = 0; i < line - 1; i++)
+			getline(this->file, str);
+		getline(this->file, str, ' ');
+		tmp.set_name(str);
+		getline(this->file, str, ' ');
+		tmp.set_kol_vo(stoi(str));
+		getline(this->file, str, ' ');
+		tmp.set_num_c(stoi(str));
+	}
+	else if (this->key == bin) {
+		size_t len;
+		for (int i = 0; i < line; i++) {
+			this->file.read((char*)(&len), sizeof(len));
+			char* n = new char[len];
+			string name;;
+			int kol_vo = 0, num_c = 0;
+
+			this->file.read((char*)(n), len);
+			name = n;
+			name[len - 1] = '\0';
+			this->file.read((char*)(&kol_vo), sizeof(int));
+			this->file.read((char*)(&num_c), sizeof(int));
+
+			tmp.set_name(name);
+			tmp.set_kol_vo(kol_vo);
+			tmp.set_num_c(num_c);
+			delete[]n;
+		}
+		a = file.tellg();
+	}
+}
+
+void File::bouble_sort_name()
+{
+	string tmp;
+	string s1, s2;
+	int pos;
+	this->open("wr");
+	/*try {
+	if (!file.is_open())
+	{
+	throw 1;
+	}
+	}
+	catch (int i)
+	{
+	Exception ex(i);
+	ex.Print();
+	return;
+	}*/
+	for (int i = 0; i < this->size - 1; i++) {
+		for (int j = 0; j < this->size - i - 1; j++)
+		{
+			this->file.seekg(0, ios_base::beg);
+			for (int k = 0; k < j; k++)
+				getline(this->file, s1);
+			getline(this->file, s1, ' ');
+			getline(this->file, s2);
+			getline(this->file, s2, ' ');
+			if (s1 > s2)
+			{
+				this->file.seekg(0, ios_base::beg);
+				pos = this->file.tellg();
+				for (int k = 0; k <= j; k++)
+				{
+					getline(this->file, s1);
+					pos = this->file.tellg();
+				}
+				tmp = s1;
+				getline(this->file, s2);
+				this->file.seekg(0, ios_base::beg);
+				for (int k = 0; k < j; k++)
+				{
+					getline(this->file, s1);
+				}
+				pos = this->file.tellg();
+				this->file.seekg(pos, ios_base::beg);
+				this->file << s2 << '\n';
+				this->file << tmp << '\n';
+			}
+		}
+	}
+	this->close();
+}
+void File::bouble_sort_kol_vo() {
+	string tmp;
+	string s1, s2;
+	int i1, i2;
+	int pos;
+	this->open("wr");
+	/*try {
+	if (!file.is_open())
+	{
+	throw 1;
+	}
+	}
+	catch (int i)
+	{
+	Exception ex(i);
+	ex.Print();
+	return;
+	}*/
+	for (int i = 0; i < this->size - 1; i++) {
+		for (int j = 0; j < this->size - i - 1; j++)
+		{
+			this->file.seekg(0, ios_base::beg);
+			for (int k = 0; k < j; k++)
+				getline(this->file, s1);
+			for (int t = 0; t < 2; t++)
+				getline(this->file, s1, ' ');
+			getline(this->file, s2);
+			for (int t = 0; t < 2; t++)
+				getline(this->file, s2, ' ');
+			i1 = stoi(s1);
+			i2 = stoi(s2);
+			if (i1 > i2)
+			{
+				this->file.seekg(0, ios_base::beg);
+				pos = this->file.tellg();
+				for (int k = 0; k <= j; k++) {
+					getline(this->file, s1);
+					pos = this->file.tellg();
+				}
+				tmp = s1;
+				getline(this->file, s2);
+				this->file.seekg(0, ios_base::beg);
+				for (int k = 0; k < j; k++) {
+					getline(this->file, s1);
+				}
+				pos = this->file.tellg();
+				this->file.seekg(pos, ios_base::beg);
+				this->file << s2 << '\n';
+				this->file << tmp << '\n';
+			}
+		}
+	}
+	this->close();
+}
+
+//File.h
+#pragma once
+#include<iostream>
+#include<fstream>
+#include<string>
+#include"t.h"
+using namespace std;
+
+enum Key { no = 0, txt, bin };
+
+class File
+{
+private:
+	fstream file;
+	string name;
+	Key key;
+	int size;
+public:
+	File();
+	File(string, Key);
+	~File();
+	void open(string);
+	void close();
+	void begin();
+	void set_size(int);
+	int get_size();
+	Production read();
+	void edit(int, Production[]);
+	void bouble_sort_name();
+	void bouble_sort_kol_vo();
+	friend File& operator<<(File&, const char*);
+	friend ostream& operator<<(ostream&, File&);
+	friend File& operator<<(File&, Production&);
+};
+
+//lab8
+#include"File.h"
+
+using namespace std;
+int main()
+{
+	Production t1("Polycarbonate", 1400, 10);
+	Production t2("Bracket", 21202, 4);
+	Production t3("Shelving", 18970, 9);
+	Production t4("Chair", 14081, 5);
+	Production t5("Bearing", 20307, 3);
+	Production un[5] = { t1,t2,t3,t4,t5 };
+	cout << "\n    RESULTS\n";
+	File f1("1.txt", txt);
+	f1.open("w");
+	f1.set_size(5);
+	f1 << t1;
+	f1 << t2;
+	f1 << t3;
+	f1 << t4;
+	f1 << t5;
+	f1.close();
+	f1.open("r");
+	cout << f1;
+	f1.close();
+	int i = 0, line = 0;
+	cout << "Sorting by product name:" << endl;
+	f1.bouble_sort_name();
+	f1.open("r");
+	cout << f1;
+	f1.close();
+	cout << "Sorting by the number of products released:" << endl;
+	f1.bouble_sort_kol_vo();
+	f1.open("r");
+	cout << f1;
+	f1.close();
+}
